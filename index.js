@@ -165,7 +165,7 @@ app.get("/users", (req, res) => {
 app.post("/users", (req, res) => {
   const { firstname, lastname, mail, password } = req.body;
   connection.query(
-    `INSERT INTO users (firstname, lastname, mail, password) VALUES (?, ? ,?, ?)`,
+    `INSERT INTO users (firstname, lastname, mail, password) VALUES (?, ? ,?, MD5(?))`,
     [firstname, lastname, mail, password],
     (err) => {
       if (err) {
