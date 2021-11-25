@@ -232,8 +232,11 @@ app.delete("/users/:id", (req, res) => {
 // LOGIN
 
 app.get("/login", (req, res) => {
-  console.log(res);
-  res.json(req.session.user);
+  if (err) {
+    res.status(500).send("Erro man");
+  } else {
+    res.status(200).json(req.session.user);
+  }
 });
 
 app.post("/login", (req, res) => {
