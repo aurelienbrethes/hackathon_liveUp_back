@@ -24,29 +24,30 @@ app.get("/events", (req, res) => {
     properties = key;
     values = req.query[key];
   });
+
   if (values && arrayLength === 1) {
     // filtre juste les artistes
     sql += ` WHERE ${properties} = ?`;
     sqlValues.push(values);
   }
-  if (req.query.artist_name && req.query.city) {
-    //filtre les artistes et la ville
+  if (req.query.artist_name && req.query.city  && !req.query.date) {
+    //filtre les artistes et la ville ca ça marche
     sql += ` WHERE artist_name = ? AND city = ? `; 
     sqlValues.push(req.query.artist_name, req.query.city);
   }
-   if (req.query.artist_name && req.query.date) {
-   //filtre les artistes et les dates 
-   sql += " WHERE artist_name = ? and date < ? ";
+   if (req.query.artist_name && req.query.date && !req.query.city) {
+   //filtre les artistes et les dates ca ça marche 
+   sql += ` WHERE artist_name = ? and date = ? `;
    sqlValues.push(req.query.artist_name, req.query.date);
  }
- if (req.query.city && req.query.date) {
-   //filtre la date et la ville
-   sql += ' WHERE city = ? AND date = ? ';
+ if (req.query.city && req.query.date && ! req.query.artist_name) {
+   //filtre la date et la ville ca ça marche
+   sql += ` WHERE city = ? AND date = ? `;
    sqlValues.push(req.query.city, req.query.date);
  }
  if (req.query.city && req.query.date && req.query.artist_name) {
    //filtre la date, la ville et l'artiste
-   sql += ' WHERE city = ? AND date = ? AND artist_name = ?';
+   sql += ` WHERE city = ? AND date = ? AND artist_name = ?`;
    sqlValues.push(req.query.city, req.query.date, req.query.artist_name);
  }
 
