@@ -2,9 +2,9 @@ const express = require("express");
 const cors = require("cors");
 const connection = require("./db_config");
 const session = require("express-session");
-const port = process.env || 9000;
 
 const app = express();
+const port = process.env || 9000;
 
 const corsOptions = {
   origin: true,
