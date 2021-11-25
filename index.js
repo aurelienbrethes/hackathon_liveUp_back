@@ -32,7 +32,7 @@ app.get("/events/", (req, res) => {
   });
 });
 
-// app.post("/api/events", (req, res) => {
+// app.post("/events/", (req, res) => {
 //   const {
 //     artist_name,
 //     date,
