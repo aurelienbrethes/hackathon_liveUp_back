@@ -61,13 +61,11 @@ app.get("/events", (req, res) => {
   }
 
   connection.query(sql, sqlValues, (err, result) => {
-    if (err) {
-      res
-        .status(500)
-        .send("Error retrieving data from database " + err.message);
-    } else {
-      res.status(200).json(result);
-    }
+    // if (err) {
+    //   res.status(500).send("Error retrieving data from database");
+    // } else {
+    res.status(200).json(result);
+    // }
   });
 });
 
