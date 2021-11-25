@@ -3,7 +3,6 @@ const cors = require("cors");
 const connection = require("./db_config");
 
 const app = express();
-const port = process.env.PORT || 8000;
 
 const corsOptions = {
   origin: true,
@@ -18,11 +17,12 @@ connection.connect((err) => {
   if (err) {
     console.log("error connecting " + err.stack);
   } else {
-    console.log("connected has id " + connection.threadId);
+    console.log("connected has id ");
   }
 });
 
 app.get("/events/", (req, res) => {
+  console.log(res);
   connection.query("SELECT * FROM events ", (err, result) => {
     if (err) {
       res.status(500).send("Error retrieving data from database");
@@ -32,6 +32,31 @@ app.get("/events/", (req, res) => {
   });
 });
 
-app.listen(port, () => {
-  console.log(`App server now listening to port ${port}`);
+// app.post("/api/events", (req, res) => {
+//   const {
+//     artist_name,
+//     date,
+//     time,
+//     posta_code,
+//     city,
+//     place,
+//     name_place,
+//     styleId,
+//   } = req.body;
+//   connection.query(
+//     `INSERT INTO usersdata (pseudo, mail, password) VALUES (?, ? ,?)`,
+//     [pseudo, mail, password],
+//     (err) => {
+//       if (err) {
+//         res.status(500).send("Error saving the movie");
+//       } else {
+//         const posted = { pseudo, mail, password };
+//         res.status(201).json(posted);
+//       }
+//     }
+//   );
+// });
+
+app.listen(() => {
+  console.log(`App server now listening to port`);
 });
