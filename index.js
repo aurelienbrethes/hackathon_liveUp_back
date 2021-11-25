@@ -15,15 +15,52 @@ app.use(cors(corsOptions));
 app.use(express.json()).use(express.urlencoded({ extended: true }));
 
 app.get("/events", (req, res) => {
-  connection.query("SELECT * FROM events ", (err, result) => {
+  let sql = "select * from events";
+  const sqlValues = [];
+  const arrayLength = Object.keys(req.query).length;
+  let properties;
+  let values;
+  Object.keys(req.query).forEach((key) => {
+    properties = key;
+    values = req.query[key];
+  });
+  if (values && arrayLength === 1) {
+    // filtre juste les artistes
+    sql += ` WHERE ${properties} = ?`;
+    sqlValues.push(values);
+  }
+  if (req.query.artist_name && req.query.city) {
+    //filtre les artistes et la ville
+    sql += ` WHERE artist_name = ? AND city = ? `; 
+    sqlValues.push(req.query.artist_name, req.query.city);
+  }
+   if (req.query.artist_name && req.query.date) {
+   //filtre les artistes et les dates 
+   sql += " WHERE artist_name = ? and date < ? ";
+   sqlValues.push(req.query.artist_name, req.query.date);
+ }
+ if (req.query.city && req.query.date) {
+   //filtre la date et la ville
+   sql += ' WHERE city = ? AND date = ? ';
+   sqlValues.push(req.query.city, req.query.date);
+ }
+ if (req.query.city && req.query.date && req.query.artist_name) {
+   //filtre la date, la ville et l'artiste
+   sql += ' WHERE city = ? AND date = ? AND artist_name = ?';
+   sqlValues.push(req.query.city, req.query.date, req.query.artist_name);
+ }
+
+  connection.query(sql, sqlValues, (err, result) => {
     if (err) {
-      res.status(500).send("Error retrieving data from database");
+      res
+        .status(500)
+        .send("Error retrieving data from database " + err.message);
     } else {
-      console.log(result);
       res.status(200).json(result);
     }
   });
 });
+
 
 app.post("/events", (req, res) => {
   const {
