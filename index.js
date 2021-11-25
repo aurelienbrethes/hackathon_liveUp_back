@@ -15,11 +15,30 @@ app.use(cors(corsOptions));
 app.use(express.json()).use(express.urlencoded({ extended: true }));
 
 app.get("/events", (req, res) => {
-  connection.query("SELECT * FROM events ", (err, result) => {
+  let sql = "select * from events";
+  const sqlValues = [];
+  const arrayLength = Object.keys(req.query).length;
+  let properties;
+  let values;
+  Object.keys(req.query).forEach((key) => {
+    properties = key;
+    values = req.query[key];
+  });
+  if (values && arrayLength === 1) {
+    // filtre juste les artistes
+    sql += ` WHERE ${properties} = ?`;
+    sqlValues.push(values);
+  }
+  if (req.query.artist_name && req.query.city) {
+    sql += ` WHERE artist_name = ? AND city = ?`;
+    sqlValues.push(req.query.artist_name, req.query.city);
+  }
+  connection.query(sql, sqlValues, (err, result) => {
     if (err) {
-      res.status(500).send("Error retrieving data from database");
+      res
+        .status(500)
+        .send("Error retrieving data from database " + err.message);
     } else {
-      console.log(result);
       res.status(200).json(result);
     }
   });
@@ -36,7 +55,6 @@ app.post("/events", (req, res) => {
     name_place,
     style,
   } = req.body;
-  console.log(req.body);
   connection.query(
     `INSERT INTO events (artist_name,
 		date,
