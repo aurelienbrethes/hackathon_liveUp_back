@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const connection = require("./db_config");
-const port = 8000;
+const port = 9000;
 
 const app = express();
 
@@ -36,7 +36,6 @@ app.post("/events", (req, res) => {
     name_place,
     style,
   } = req.body;
-  console.log(req.body);
   connection.query(
     `INSERT INTO events (artist_name,
 		date,
@@ -66,6 +65,35 @@ app.post("/events", (req, res) => {
     }
   );
 });
+
+// STYLES TABLE
+
+// DISPLAY ELEMENTS IN STYLES TABLE
+
+app.get("/styles", (req, res) => {
+  connection.query("SELECT * FROM styles ", (err, result) => {
+    if (err) {
+      res.status(500).send("Error retrieving data from database");
+    } else {
+      console.log(result);
+      res.status(200).json(result);
+    }
+  });
+});
+
+// ADDING ELEMENTS IN STYLES TABLE
+
+app.post("/styles", (req, res) => {
+  const { name_style } = req.body;
+  connection.query(`INSERT INTO styles (name_style) VALUES (?)`, [name_style], (err) => {
+    if(err) {
+      res.status(500).send("Error saving the event " + err.message);
+    } else {
+      const posted = { name_style };
+      res.status(201).json(posted);
+    }
+  })
+})
 
 app.listen(port, () => {
   console.log(`App server now listening to port ${port}`);
