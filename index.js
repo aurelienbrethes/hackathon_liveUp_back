@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const connection = require("./db_config");
-const session = require('express-session');
+const session = require("express-session");
 const port = 9000;
 
 const app = express();
@@ -15,7 +15,7 @@ app.use(cors(corsOptions));
 
 app.use(
   session({
-    secret: '12345',
+    secret: "12345",
     resave: false,
     saveUninitialized: false,
     cookie: { maxAge: 24 * 60 * 60 * 365 * 1000 },
@@ -34,32 +34,31 @@ app.get("/events", (req, res) => {
     properties = key;
     values = req.query[key];
   });
-
   if (values && arrayLength === 1) {
     // filtre juste les artistes
     sql += ` WHERE ${properties} = ?`;
     sqlValues.push(values);
   }
-  if (req.query.artist_name && req.query.city  && !req.query.date) {
+  if (req.query.artist_name && req.query.city && !req.query.date) {
     //filtre les artistes et la ville ca ça marche
-    sql += ` WHERE artist_name = ? AND city = ? `; 
+    sql += ` WHERE artist_name = ? AND city = ? `;
     sqlValues.push(req.query.artist_name, req.query.city);
   }
-   if (req.query.artist_name && req.query.date && !req.query.city) {
-   //filtre les artistes et les dates ca ça marche 
-   sql += ` WHERE artist_name = ? and date = ? `;
-   sqlValues.push(req.query.artist_name, req.query.date);
- }
- if (req.query.city && req.query.date && ! req.query.artist_name) {
-   //filtre la date et la ville ca ça marche
-   sql += ` WHERE city = ? AND date = ? `;
-   sqlValues.push(req.query.city, req.query.date);
- }
- if (req.query.city && req.query.date && req.query.artist_name) {
-   //filtre la date, la ville et l'artiste
-   sql += ` WHERE city = ? AND date = ? AND artist_name = ?`;
-   sqlValues.push(req.query.city, req.query.date, req.query.artist_name);
- }
+  if (req.query.artist_name && req.query.date && !req.query.city) {
+    //filtre les artistes et les dates ca ça marche
+    sql += ` WHERE artist_name = ? and date = ? `;
+    sqlValues.push(req.query.artist_name, req.query.date);
+  }
+  if (req.query.city && req.query.date && !req.query.artist_name) {
+    //filtre la date et la ville ca ça marche
+    sql += ` WHERE city = ? AND date = ? `;
+    sqlValues.push(req.query.city, req.query.date);
+  }
+  if (req.query.city && req.query.date && req.query.artist_name) {
+    //filtre la date, la ville et l'artiste
+    sql += ` WHERE city = ? AND date = ? AND artist_name = ?`;
+    sqlValues.push(req.query.city, req.query.date, req.query.artist_name);
+  }
 
   connection.query(sql, sqlValues, (err, result) => {
     if (err) {
@@ -71,7 +70,6 @@ app.get("/events", (req, res) => {
     }
   });
 });
-
 
 app.post("/events", (req, res) => {
   const {
@@ -133,15 +131,19 @@ app.get("/styles", (req, res) => {
 
 app.post("/styles", (req, res) => {
   const { name_style } = req.body;
-  connection.query(`INSERT INTO styles (name_style) VALUES (?)`, [name_style], (err) => {
-    if(err) {
-      res.status(500).send("Error saving the event " + err.message);
-    } else {
-      const posted = { name_style };
-      res.status(201).json(posted);
+  connection.query(
+    `INSERT INTO styles (name_style) VALUES (?)`,
+    [name_style],
+    (err) => {
+      if (err) {
+        res.status(500).send("Error saving the event " + err.message);
+      } else {
+        const posted = { name_style };
+        res.status(201).json(posted);
+      }
     }
-  })
-})
+  );
+});
 
 // ACCOUNT MEMBERS
 
@@ -158,14 +160,14 @@ app.get("/users", (req, res) => {
 
 // CREATE AN USER
 
-app.post('/users', (req, res) => {
+app.post("/users", (req, res) => {
   const { firstname, lastname, mail, password } = req.body;
   connection.query(
     `INSERT INTO users (firstname, lastname, mail, password) VALUES (?, ? ,?, ?)`,
     [firstname, lastname, mail, password],
     (err) => {
       if (err) {
-        res.status(500).send('Error saving the user');
+        res.status(500).send("Error saving the user");
       } else {
         const posted = { firstname, lastname, mail, password };
         res.status(201).json(posted);
@@ -176,26 +178,26 @@ app.post('/users', (req, res) => {
 
 // MODIF AN USER
 
-app.put('/users/:id', (req, res) => {
+app.put("/users/:id", (req, res) => {
   const userId = req.params.id;
   connection.query(
-    'SELECT * FROM users WHERE id = ?',
+    "SELECT * FROM users WHERE id = ?",
     [userId],
     (err, selectUser) => {
       if (err) {
         console.log(err);
-        res.status(500).send('Error');
+        res.status(500).send("Error");
       } else {
         const userFromDb = selectUser[0];
         if (userFromDb) {
           const userToUpdate = req.body;
           connection.query(
-            'UPDATE users SET ? WHERE id = ?',
+            "UPDATE users SET ? WHERE id = ?",
             [userToUpdate, userId],
             (error) => {
               if (error) {
                 console.log(error);
-                res.status(500).send('Error updating an user');
+                res.status(500).send("Error updating an user");
               } else {
                 const updated = { ...userFromDb, ...userToUpdate };
                 res.status(200).json(updated);
@@ -212,17 +214,17 @@ app.put('/users/:id', (req, res) => {
 
 // DELETE AN USER
 
-app.delete('/users/:id', (req, res) => {
+app.delete("/users/:id", (req, res) => {
   const usersId = req.params.id;
   connection.query(
-    'DELETE FROM users WHERE id = ?',
+    "DELETE FROM users WHERE id = ?",
     [usersId],
     (err, results) => {
       if (err) {
         console.log(err);
-        res.status(500).send('Error deleting an user');
+        res.status(500).send("Error deleting an user");
       } else {
-        const deleted = { usersId }
+        const deleted = { usersId };
         res.status(200).send(deleted);
       }
     }
@@ -231,20 +233,20 @@ app.delete('/users/:id', (req, res) => {
 
 // LOGIN
 
-app.get('/login', (req, res) => {
+app.get("/login", (req, res) => {
   res.json(req.session.user);
 });
 
-app.post('/login', (req, res) => {
+app.post("/login", (req, res) => {
   req.session.user = req.body;
   req.session.save();
   res.json(req.session.user);
 });
 
-app.post('/logout', (req, res) => {
+app.post("/logout", (req, res) => {
   if (req.session) {
     req.session.destroy((error) => {
-      res.redirect('/');
+      res.redirect("/");
       if (error) {
         console.log(error);
       }
