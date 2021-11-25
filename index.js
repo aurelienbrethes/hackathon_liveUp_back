@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const connection = require("./db_config");
+const port = 8000;
 
 const app = express();
 
@@ -13,50 +14,59 @@ app.use(cors(corsOptions));
 
 app.use(express.json()).use(express.urlencoded({ extended: true }));
 
-connection.connect((err) => {
-  if (err) {
-    console.log("error connecting " + err.stack);
-  } else {
-    console.log("connected has id ");
-  }
-});
-
-app.get("/events/", (req, res) => {
-  console.log(res);
+app.get("/events", (req, res) => {
   connection.query("SELECT * FROM events ", (err, result) => {
     if (err) {
       res.status(500).send("Error retrieving data from database");
     } else {
+      console.log(result);
       res.status(200).json(result);
     }
   });
 });
 
-// app.post("/events/", (req, res) => {
-//   const {
-//     artist_name,
-//     date,
-//     time,
-//     posta_code,
-//     city,
-//     place,
-//     name_place,
-//     styleId,
-//   } = req.body;
-//   connection.query(
-//     `INSERT INTO usersdata (pseudo, mail, password) VALUES (?, ? ,?)`,
-//     [pseudo, mail, password],
-//     (err) => {
-//       if (err) {
-//         res.status(500).send("Error saving the movie");
-//       } else {
-//         const posted = { pseudo, mail, password };
-//         res.status(201).json(posted);
-//       }
-//     }
-//   );
-// });
+app.post("/events", (req, res) => {
+  const {
+    artist_name,
+    date,
+    time,
+    postal_code,
+    city,
+    location,
+    name_place,
+    style,
+  } = req.body;
+  console.log(req.body);
+  connection.query(
+    `INSERT INTO events (artist_name,
+		date,
+		time,
+		postal_code,
+		city,
+		location,
+		name_place,
+		style) VALUES (?, ? ,?, ?, ?, ?, ?, ?)`,
+    [artist_name, date, time, postal_code, city, location, name_place, style],
+    (err) => {
+      if (err) {
+        res.status(500).send("Error saving the event " + err.message);
+      } else {
+        const posted = {
+          artist_name,
+          date,
+          time,
+          postal_code,
+          city,
+          location,
+          name_place,
+          style,
+        };
+        res.status(201).json(posted);
+      }
+    }
+  );
+});
 
-app.listen(() => {
-  console.log(`App server now listening to port`);
+app.listen(port, () => {
+  console.log(`App server now listening to port ${port}`);
 });
