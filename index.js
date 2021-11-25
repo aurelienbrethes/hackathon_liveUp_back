@@ -4,7 +4,7 @@ const connection = require("./db_config");
 const session = require("express-session");
 
 const app = express();
-const port = process.env.PORT || 9000;
+const port = process.env.PORT;
 
 const corsOptions = {
   origin: true,
