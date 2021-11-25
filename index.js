@@ -24,6 +24,10 @@ app.use(
 
 app.use(express.json()).use(express.urlencoded({ extended: true }));
 
+app.get("/coucou", (req, res) => {
+  res.status(200).send("hibou");
+});
+
 app.get("/events", (req, res) => {
   let sql = "select * from events";
   const sqlValues = [];
