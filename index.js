@@ -236,7 +236,7 @@ app.delete("/users/:id", (req, res) => {
 // LOGIN
 
 app.get("/login", (req, res) => {
-  res.json("coucou");
+  res.json(req.session.user);
 });
 
 app.post("/login", (req, res) => {
