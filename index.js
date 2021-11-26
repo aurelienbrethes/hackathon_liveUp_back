@@ -148,11 +148,13 @@ app.post("/styles", (req, res) => {
 app.get("/users", (req, res) => {
   let sql = "select * from users";
   const sqlValues = [];
+
   if (req.query.mail) {
     // filtre juste les mail
     sql += ` WHERE mail = ?`;
     sqlValues.push(req.query.mail);
   }
+  console.log(sql);
   connection.query(sql, (err, result) => {
     if (err) {
       res.status(500).send("Error retrieving data from database");
