@@ -146,7 +146,14 @@ app.post("/styles", (req, res) => {
 // ACCOUNT MEMBERS
 
 app.get("/users", (req, res) => {
-  connection.query("SELECT * FROM users ", (err, result) => {
+  let sql = "select * from users";
+  const sqlValues = [];
+  if (req.query.mail) {
+    // filtre juste les mail
+    sql += ` WHERE mail = ?`;
+    sqlValues.push(req.query.mail);
+  }
+  connection.query(sql, (err, result) => {
     if (err) {
       res.status(500).send("Error retrieving data from database");
     } else {
