@@ -250,6 +250,7 @@ app.get("/login", (req, res) => {
 
 app.post("/login", (req, res) => {
   req.session.user = req.body;
+  res.cookie("mail", req.session.user.mail);
   req.session.save(() => {
     console.log(req.session);
     console.log(req.protocol);
