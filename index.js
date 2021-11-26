@@ -16,7 +16,7 @@ app.use(cors(corsOptions));
 
 app.use(
   session({
-    secret: "keyboard cat",
+    secret: "12345",
     resave: false,
     saveUninitialized: false,
     cookie: { maxAge: 60000 },
@@ -250,18 +250,9 @@ app.get("/login", (req, res) => {
 
 app.post("/login", (req, res) => {
   req.session.user = req.body.mail;
-  req.send(req.session.user + "connected");
-  //   res.cookie("mail", req.session.user.mail, {
-  //     maxAge: 9000000,
-  //     httpOnly: false,
-  //   });
-  //   req.session.save(() => {
-  //     console.log(req.session);
-  //     console.log(req.protocol);
-  //     res.send(req.session.user + " " + "connected");
-  //   });
-
-  console.log(req.session);
+  req.session.save(() => {
+    res.send(req.session.user + " " + "connected");
+  });
 });
 
 app.post("/logout", (req, res) => {
