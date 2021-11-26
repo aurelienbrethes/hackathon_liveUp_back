@@ -16,10 +16,10 @@ app.use(cors(corsOptions));
 
 app.use(
   session({
-    secret: "12345",
+    secret: "keyboard cat",
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 24 * 60 * 60 * 365 * 1000 },
+    cookie: { maxAge: 60000 },
   })
 );
 
@@ -249,16 +249,17 @@ app.get("/login", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  req.session.user = req.body;
-  res.cookie("mail", req.session.user.mail, {
-    maxAge: 9000000,
-    httpOnly: false,
-  });
-  req.session.save(() => {
-    console.log(req.session);
-    console.log(req.protocol);
-    res.send(req.session.user + " " + "connected");
-  });
+  req.session.user = req.body.mail;
+  req.send(req.session.user + "connected");
+  //   res.cookie("mail", req.session.user.mail, {
+  //     maxAge: 9000000,
+  //     httpOnly: false,
+  //   });
+  //   req.session.save(() => {
+  //     console.log(req.session);
+  //     console.log(req.protocol);
+  //     res.send(req.session.user + " " + "connected");
+  //   });
 
   console.log(req.session);
 });
