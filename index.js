@@ -155,7 +155,7 @@ app.get("/users", (req, res) => {
     sqlValues.push(req.query.mail);
   }
   console.log(sql);
-  connection.query(sql, (err, result) => {
+  connection.query(sql, sqlValues, (err, result) => {
     if (err) {
       res.status(500).send("Error retrieving data from database");
     } else {
