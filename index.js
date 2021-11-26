@@ -249,6 +249,7 @@ app.post("/login", (req, res) => {
   req.session.user = req.body;
   req.session.save(() => {
     console.log(req.session);
+    console.log(req.protocol);
     res.json(req.session.user);
   });
 
