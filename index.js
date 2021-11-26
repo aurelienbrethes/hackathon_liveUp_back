@@ -245,14 +245,12 @@ app.delete("/users/:id", (req, res) => {
 
 app.get("/login", (req, res) => {
   res.json(req.session.user);
-  console.log(req.session);
 });
 
 app.post("/login", (req, res) => {
-  req.session.user = req.body.mail;
-  req.session.save(() => {
-    res.send(req.session.user + " " + "connected");
-  });
+  req.session.user = req.body;
+  req.session.save();
+  res.json(req.session.user);
 });
 
 app.post("/logout", (req, res) => {
