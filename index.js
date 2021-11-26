@@ -237,8 +237,13 @@ app.get("/login", (req, res) => {
 
 app.post("/login", (req, res) => {
   req.session.user = req.body;
-  req.session.save();
-  res.json(req.session.user);
+  req.session.save((err) => {
+    if (err) {
+      console.log(err);
+    } else {
+      res.json(req.session.user);
+    }
+  });
 });
 
 app.post("/logout", (req, res) => {
