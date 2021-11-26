@@ -3,7 +3,6 @@ const cors = require("cors");
 const connection = require("./db_config");
 const session = require("express-session");
 const cookieParser = require("cookie-parser"); // module for parsing cookies
-app.use(cookieParser());
 
 const app = express();
 const port = process.env.PORT || 9000;
@@ -25,6 +24,8 @@ app.use(
 );
 
 app.use(express.json()).use(express.urlencoded({ extended: true }));
+
+app.use(cookieParser());
 
 app.get("/events", (req, res) => {
   let sql = "select * from events";
