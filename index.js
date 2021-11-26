@@ -248,6 +248,7 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   req.session.user = req.body;
   req.session.save();
+  res.json(req.session.user);
   console.log(req.session);
 });
 
