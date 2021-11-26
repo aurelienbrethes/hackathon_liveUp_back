@@ -18,7 +18,7 @@ app.use(
     secret: "12345",
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 24 * 60 * 60 * 365 * 1000 },
+    cookie: { maxAge: 24 * 60 * 60 * 365 * 1000, secure: false },
   })
 );
 
@@ -247,8 +247,11 @@ app.get("/login", (req, res) => {
 
 app.post("/login", (req, res) => {
   req.session.user = req.body;
-  req.session.save();
-  res.json(req.session.user);
+  req.session.save(() => {
+    console.log(req.session);
+    res.json(req.session.user);
+  });
+
   console.log(req.session);
 });
 
