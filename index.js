@@ -2,6 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const connection = require("./db_config");
 const session = require("express-session");
+const cookieParser = require("cookie-parser"); // module for parsing cookies
+app.use(cookieParser());
 
 const app = express();
 const port = process.env.PORT || 9000;
