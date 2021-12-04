@@ -1,4 +1,5 @@
 const express = require("express");
+const app = express();
 const cors = require("cors");
 const connection = require("./db_config");
 const session = require("express-session");
@@ -6,13 +7,12 @@ const redis = require("ioredis");
 const redisClient = redis.createClient(process.env.REDIS_URL);
 const redisStore = require("connect-redis")(session);
 
-const app = express();
 const port = process.env.PORT || 9000;
 
 redisClient.on("error", (err) => {
   console.log("Redis error: ", err);
 });
-
+app.set("trust proxy", 1);
 const corsOptions = {
   origin: "https://aurelienbrethes.github.io",
   credentials: true, // access-control-allow-credentials:true
@@ -158,7 +158,6 @@ app.get("/styles", (req, res) => {
     if (err) {
       res.status(500).send("Error retrieving data from database");
     } else {
-      console.log(result);
       res.status(200).json(result);
     }
   });
@@ -197,7 +196,6 @@ app.get("/users", (req, res) => {
     if (err) {
       res.status(500).send("Error retrieving data from database");
     } else {
-      console.log(result);
       res.status(200).json(result);
     }
   });
