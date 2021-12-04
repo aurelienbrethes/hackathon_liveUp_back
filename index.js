@@ -2,30 +2,66 @@ const express = require("express");
 const cors = require("cors");
 const connection = require("./db_config");
 const session = require("express-session");
-const cookieParser = require("cookie-parser"); // module for parsing cookies
+const redis = require("ioredis");
+const redisClient = redis.createClient(process.env.REDIS_URL);
+const redisStore = require("connect-redis")(session);
 
 const app = express();
 const port = process.env.PORT || 9000;
 
+redisClient.on("error", (err) => {
+  console.log("Redis error: ", err);
+});
+
 const corsOptions = {
-  origin: true,
+  origin: "https://aurelienbrethes.github.io/",
   credentials: true, // access-control-allow-credentials:true
   optionSuccessStatus: 200,
 };
 app.use(cors(corsOptions));
 
+app.use(express.json()).use(express.urlencoded({ extended: true }));
+
 app.use(
   session({
     secret: "12345",
-    resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 60000 },
+    resave: false,
+    // unset: "destroy",
+    httpOnly: false,
+    cookie: {
+      sameSite: "none",
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      secure: true,
+    },
+    store: new redisStore({ client: redisClient }),
   })
 );
 
-app.use(express.json()).use(express.urlencoded({ extended: true }));
+// LOGIN
 
-app.use(cookieParser());
+app.get("/login", (req, res) => {
+  res.json(req.session.user);
+});
+
+app.post("/login", (req, res) => {
+  const sess = req.session;
+  //   req.session.save();
+  sess.user = req.body;
+  res.json(req.session.user);
+  res.end("done");
+});
+
+app.delete("/logout", function (req, res) {
+  if (req.session) {
+    req.session.destroy(function () {
+      res.clearCookie("connect.sid", { path: "/" });
+      res.status(200).send("removed session");
+    });
+  } else {
+    res.status(400).send("no session assigned");
+  }
+});
 
 app.get("/events", (req, res) => {
   let sql = "select * from events";
@@ -157,7 +193,6 @@ app.get("/users", (req, res) => {
     sql += ` WHERE mail = ?`;
     sqlValues.push(req.query.mail);
   }
-  console.log(sql);
   connection.query(sql, sqlValues, (err, result) => {
     if (err) {
       res.status(500).send("Error retrieving data from database");
@@ -239,29 +274,6 @@ app.delete("/users/:id", (req, res) => {
       }
     }
   );
-});
-
-// LOGIN
-
-app.get("/login", (req, res) => {
-  res.json(req.session.user);
-});
-
-app.post("/login", (req, res) => {
-  req.session.user = req.body;
-  req.session.save();
-  res.json(req.session.user);
-});
-
-app.post("/logout", (req, res) => {
-  if (req.session) {
-    req.session.destroy((error) => {
-      res.redirect("/");
-      if (error) {
-        console.log(error);
-      }
-    });
-  }
 });
 
 // LOCALHOST
