@@ -14,7 +14,7 @@ redisClient.on("error", (err) => {
 });
 
 const corsOptions = {
-  origin: "https://aurelienbrethes.github.io/",
+  origin: "https://aurelienbrethes.github.io",
   credentials: true, // access-control-allow-credentials:true
   optionSuccessStatus: 200,
 };
