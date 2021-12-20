@@ -18,6 +18,7 @@ const corsOptions = {
   origin: "https://matthieudubo.github.io",
   credentials: true, // access-control-allow-credentials:true
   optionSuccessStatus: 200,
+  maxAge: 3600
 };
 app.use(cors(corsOptions));
 
