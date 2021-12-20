@@ -46,13 +46,33 @@ app.get("/login", (req, res) => {
   res.json(req.session.user);
 });
 
+// app.post("/login", (req, res) => {
+//   const sess = req.session;
+//   //   req.session.save();
+//   sess.user = req.body;
+//   res.json(req.session.user);
+//   res.end("done");
+// });
+
 app.post("/login", (req, res) => {
   const sess = req.session;
-  //   req.session.save();
-  sess.user = req.body;
-  res.json(req.session.user);
-  res.end("done");
-});
+  const { mail, password } = req.body;
+  connection.query('SELECT * FROM users WHERE mail = ?', [mail], (err, result) => {
+    if (err) {
+      res.status(401).send('Invalid credentials');
+    } else {
+      verifyPassword(password, result.password).then((passwordCorrect) => {
+        if (passwordCorrect) {
+          sess.user = req.body;
+          res.json(req.session.user);
+          res.end("done");
+        } else {
+          res.status(401).send('Invalid credentials');
+        }
+      })
+    }
+  })
+})
 
 app.delete("/logout", function (req, res) {
   if (req.session) {
