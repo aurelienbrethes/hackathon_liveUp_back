@@ -6,6 +6,7 @@ const session = require("express-session");
 const redis = require("ioredis");
 const redisClient = redis.createClient(process.env.REDIS_URL);
 const redisStore = require("connect-redis")(session);
+const argon2 = require('argon2');
 
 const port = process.env.PORT || 9000;
 
@@ -14,7 +15,7 @@ redisClient.on("error", (err) => {
 });
 app.set("trust proxy", 1);
 const corsOptions = {
-  origin: "https://aurelienbrethes.github.io",
+  origin: "https://matthieudubo.github.io",
   credentials: true, // access-control-allow-credentials:true
   optionSuccessStatus: 200,
 };
@@ -205,19 +206,38 @@ app.get("/users", (req, res) => {
 
 app.post("/users", (req, res) => {
   const { firstname, lastname, mail, password } = req.body;
-  connection.query(
-    `INSERT INTO users (firstname, lastname, mail, password) VALUES (?, ? ,?, MD5(?))`,
-    [firstname, lastname, mail, password],
+  hashPassword(password).then((hashedPassword) => {
+    connection.query(
+    `INSERT INTO users (firstname, lastname, mail, password) VALUES (?, ? ,?, ?)`,
+    [firstname, lastname, mail, hashedPassword],
     (err) => {
       if (err) {
         res.status(500).send("Error saving the user");
       } else {
-        const posted = { firstname, lastname, mail, password };
+        const posted = { firstname, lastname, mail, hashedPassword };
         res.status(201).json(posted);
       }
     }
   );
+  });
 });
+
+// HASHING PASSWORD
+
+const hashingOptions = {
+  type: argon2.argon2id,
+  memoryCost: 2 ** 16,
+  timeCost: 5,
+  parallelism: 1,
+};
+
+const hashPassword = (plainPassword) => {
+  return argon2.hash(plainPassword, hashingOptions);
+};
+
+const verifyPassword = (plainPassword, hashedPassword) => {
+  return argon2.verify(hashedPassword, plainPassword, hashingOptions);
+};
 
 // MODIF AN USER
 
